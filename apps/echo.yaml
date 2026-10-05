@@ -1,0 +1,24 @@
+# Test app published through the App Gateway. Gateway API and ALB CRDs are installed by the ALB controller at
+# startup, so the first syncs fail until it's running; the retry covers that.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: echo
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nekrerzy/bap-sbx-gitops.git
+    targetRevision: main
+    path: workloads/echo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: echo
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true, SkipDryRunOnMissingResource=true]
+    retry:
+      limit: 20
+      backoff: { duration: 30s, factor: 1, maxDuration: 30s }

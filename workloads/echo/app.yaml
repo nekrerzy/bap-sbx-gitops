@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: echo }
+  template:
+    metadata:
+      labels: { app: echo }
+    spec:
+      nodeSelector:
+        bap.io/pool: apps
+      containers:
+        - name: echo
+          image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+          ports: [{ containerPort: 80 }]
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 200m, memory: 128Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo
+spec:
+  selector: { app: echo }
+  ports: [{ port: 80, targetPort: 80 }]

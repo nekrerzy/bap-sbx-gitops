@@ -1,0 +1,32 @@
+# ALB controller: programs Application Gateway for Containers from Gateway API objects.
+# Identity comes from Terraform (workload_identity_client_ids["alb-controller"]); runs on the platform pool.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alb-controller
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: mcr.microsoft.com/application-lb/charts
+    chart: alb-controller
+    targetRevision: 1.12.2
+    helm:
+      valuesObject:
+        albController:
+          namespace: azure-alb-system
+          podIdentity:
+            clientID: 9bf3f56e-8b51-4f63-bd47-f512d2abf0d6
+          controller:
+            nodeSelector:
+              bap.io/pool: platform
+            tolerations:
+              - { key: bap.io/pool, operator: Equal, value: platform, effect: NoSchedule }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: azure-alb-helm
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true, ServerSideApply=true]
