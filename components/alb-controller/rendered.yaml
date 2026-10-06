@@ -18,7 +18,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    azure.workload.identity/client-id: 3dfefaa0-efd4-420c-a647-13b76df6d489
+    azure.workload.identity/client-id: f6630cb3-53de-4301-a351-03ae8063f6e4
   labels:
     azure.workload.identity/use: "true"
   name: alb-controller-sa
@@ -246,7 +246,7 @@ spec:
           command: ['/alb-controller']
           env:
           - name: AZURE_CLIENT_ID
-            value: 3dfefaa0-efd4-420c-a647-13b76df6d489
+            value: f6630cb3-53de-4301-a351-03ae8063f6e4
           args: [
             "--log-level", "info",
             "--namespace", "azure-alb-system",

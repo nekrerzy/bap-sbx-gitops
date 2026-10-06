@@ -2,7 +2,7 @@
 albController:
   namespace: azure-alb-system
   podIdentity:
-    clientID: 3dfefaa0-efd4-420c-a647-13b76df6d489
+    clientID: f6630cb3-53de-4301-a351-03ae8063f6e4
   controller:
     nodeSelector:
       bap.io/pool: platform
