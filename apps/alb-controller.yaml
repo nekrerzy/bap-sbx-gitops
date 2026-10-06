@@ -1,5 +1,5 @@
 # ALB controller: programs Application Gateway for Containers from Gateway API objects.
-# Identity comes from Terraform (workload_identity_client_ids["alb-controller"]); runs on the platform pool.
+# Rendered from Microsoft's chart and patched for the AKS "no privilege escalation" policy (components/alb-controller).
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,23 +10,12 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: mcr.microsoft.com/application-lb/charts
-    chart: alb-controller
-    targetRevision: 1.12.2
-    helm:
-      valuesObject:
-        albController:
-          namespace: azure-alb-system
-          podIdentity:
-            clientID: 9bf3f56e-8b51-4f63-bd47-f512d2abf0d6
-          controller:
-            nodeSelector:
-              bap.io/pool: platform
-            tolerations:
-              - { key: bap.io/pool, operator: Equal, value: platform, effect: NoSchedule }
+    repoURL: https://github.com/nekrerzy/bap-sbx-gitops.git
+    targetRevision: main
+    path: components/alb-controller
   destination:
     server: https://kubernetes.default.svc
-    namespace: azure-alb-helm
+    namespace: azure-alb-system
   syncPolicy:
     automated: { prune: true, selfHeal: true }
     syncOptions: [CreateNamespace=true, ServerSideApply=true]

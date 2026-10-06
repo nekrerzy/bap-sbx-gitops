@@ -1,0 +1,25 @@
+# ALB controller from Microsoft's chart, rendered by render.sh and patched for Bain's AKS policy
+# ("no privilege escalation"): the chart's init containers set no securityContext and the chart has no value for it.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - rendered.yaml
+patches:
+  - target:
+      kind: Deployment
+      name: alb-controller
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: alb-controller
+      spec:
+        template:
+          spec:
+            initContainers:
+              - name: init-alb-controller-crds
+                securityContext:
+                  allowPrivilegeEscalation: false
+              - name: init-alb-controller-bootstrap
+                securityContext:
+                  allowPrivilegeEscalation: false
